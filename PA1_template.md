@@ -2,7 +2,7 @@
 title: "Reproducible Research: Peer Assessment 1"
 output: 
   html_document:
-    keep_md: true
+    keep_md: yes
 ---
 
 
@@ -18,6 +18,7 @@ The following code is used for downloading, unzipping and creating the required 
 
 
 ```r
+knitr::opts_chunk$set(dev="png", fig.keep = "all")
 # Create directory which the data will be downloaded to if it doesn't already exists
 if(!dir.exists("data")) {
     dir.create ("data")
@@ -67,14 +68,14 @@ stepsperday <- data %>%
 In a histogram this will look like this:  
 
 ```r
-png("./figure/histogram_not imputated.png")
+#png("./figure/histogram_not imputated.png")
 hist(stepsperday$totalsteps,main="steps per day",xlab = "Number of steps")
-dev.off()
 ```
 
-```
-## quartz_off_screen 
-##                 2
+![](PA1_template_files/figure-html/total_steps_per_day_histogram-1.png)<!-- -->
+
+```r
+#dev.off()
 ```
 
 The mean of the total number of steps taken per day is  
@@ -109,14 +110,14 @@ stepsperinterval <- data %>%
     group_by(interval) %>%
     summarize(averagesteps = mean(steps))
 
-png("./figure/daily_activity_pattern.png")
+##png("./figure/daily_activity_pattern.png")
 plot(x=stepsperinterval$interval,y=stepsperinterval$averagesteps,type="l",xlab="interval",ylab="average nr of steps")
-dev.off()
 ```
 
-```
-## quartz_off_screen 
-##                 2
+![](PA1_template_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
+
+```r
+##dev.off()
 ```
 
 The maximum amount of steps in a 5-minute interval is:
@@ -165,14 +166,14 @@ stepsperday_new <- data %>%
     group_by(date) %>%
     summarize(totalsteps = sum(steps))
 
-png("./figure/histogram_imputated.png")
+##png("./figure/histogram_imputated.png")
 hist(stepsperday_new$totalsteps,main="steps per day",xlab = "Number of steps")
-dev.off()
 ```
 
-```
-## quartz_off_screen 
-##                 2
+![](PA1_template_files/figure-html/unnamed-chunk-11-1.png)<!-- -->
+
+```r
+##dev.off()
 ```
 
 
@@ -229,15 +230,15 @@ data <- data%>%
 
 
 ```r
-png("./figure/activity_weekend_weekdays.png", width = 800, height = 600)
+##png("./figure/activity_weekend_weekdays.png", width = 800, height = 600)
 ggplot(data,(aes(x=data$interval,y=data$averagesteps)))+
     geom_line(aes(colour=data$daytype))+
     facet_grid(data$daytype~.)+
     labs(x= "Interval", y= "Number of steps",colour="Type of day") 
-dev.off()
 ```
 
-```
-## quartz_off_screen 
-##                 2
+![](PA1_template_files/figure-html/unnamed-chunk-17-1.png)<!-- -->
+
+```r
+##dev.off()
 ```
