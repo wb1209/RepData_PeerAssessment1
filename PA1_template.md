@@ -16,7 +16,8 @@ If it does not exists it will be created as a subdirectory of the working direct
 
 The following code is used for downloading, unzipping and creating the required directories:  
 
-```{r echo=TRUE}
+
+```r
 # Create directory which the data will be downloaded to if it doesn't already exists
 if(!dir.exists("data")) {
     dir.create ("data")
@@ -40,7 +41,8 @@ if(!file.exists("./data/dataset.zip")){
 ```
 
 Then we read in the data
-```{r echo=TRUE}
+
+```r
 data <- read.csv("./data/activity.csv",header=TRUE,sep = ",",stringsAsFactors = FALSE)
 ```
 
@@ -49,41 +51,59 @@ data <- read.csv("./data/activity.csv",header=TRUE,sep = ",",stringsAsFactors = 
 ## What is mean total number of steps taken per day?
 
 
-```{r echo=TRUE, message=FALSE}
+
+```r
 require(dplyr)
 ```
 
-```{r}
+
+```r
 stepsperday <- data %>%
     filter(!is.na(steps)) %>%
     group_by(date) %>%
     summarize(totalsteps = sum(steps))
-
 ```
 
 In a histogram this will look like this:  
-```{r echo=TRUE}
+
+```r
 png("./figure/histogram_not imputated.png")
 hist(stepsperday$totalsteps,main="steps per day",xlab = "Number of steps")
 dev.off()
 ```
 
+```
+## quartz_off_screen 
+##                 2
+```
+
 The mean of the total number of steps taken per day is  
 
-```{r echo=TRUE}
+
+```r
 mean(stepsperday$totalsteps)
+```
+
+```
+## [1] 10766.19
 ```
 
 The median of the total number of steps taken per day is  
 
-```{r echo=TRUE}
+
+```r
 median(stepsperday$totalsteps)
+```
+
+```
+## [1] 10765
 ```
 
 
 
 ## What is the average daily activity pattern?
-```{r echo=TRUE}
+
+```r
 stepsperinterval <- data %>%
     filter(!is.na(steps)) %>%
     group_by(interval) %>%
@@ -94,10 +114,23 @@ plot(x=stepsperinterval$interval,y=stepsperinterval$averagesteps,type="l",xlab="
 dev.off()
 ```
 
+```
+## quartz_off_screen 
+##                 2
+```
+
 The maximum amount of steps in a 5-minute interval is:
 
-```{r echo=TRUE}
+
+```r
 stepsperinterval[stepsperinterval$averagesteps==max(stepsperinterval$averagesteps),1]
+```
+
+```
+## # A tibble: 1 x 1
+##   interval
+##      <int>
+## 1      835
 ```
 
 
@@ -107,15 +140,17 @@ stepsperinterval[stepsperinterval$averagesteps==max(stepsperinterval$averagestep
 
 The total number of missing values is calculated as follows:
 
-```{r echo=TRUE}
+
+```r
 sum <- sum(is.na(data$steps))
 ```
 
-The total number of missing values is `r sum`
+The total number of missing values is 2304
 
 We imputate the missing values by the average number of steps per interval across all days as follows:
 
-```{r echo=TRUE}
+
+```r
 for (i in unique(data[is.na(data$steps),]$interval)) {
     value <- min(subset(stepsperinterval, interval == i, select = c("averagesteps")))
     data[is.na(data$steps) & data$interval == i,]$steps <- value
@@ -124,7 +159,8 @@ for (i in unique(data[is.na(data$steps),]$interval)) {
 
 Now we have created a dataset called data with imputed values we reproducte the historgram and recalculate the mean and median values by running similar code as before.
 
-```{r echo=TRUE}
+
+```r
 stepsperday_new <- data %>%
     group_by(date) %>%
     summarize(totalsteps = sum(steps))
@@ -134,41 +170,51 @@ hist(stepsperday_new$totalsteps,main="steps per day",xlab = "Number of steps")
 dev.off()
 ```
 
+```
+## quartz_off_screen 
+##                 2
+```
 
 
-```{r echo=TRUE}
+
+
+```r
 meannew <- as.integer(mean(stepsperday_new$totalsteps))
 ```
 
-The mean of the total number of steps taken per day now is  `r meannew`
+The mean of the total number of steps taken per day now is  10766
 
 
 
-```{r echo=TRUE}
+
+```r
 mediannew <-as.integer(median(stepsperday_new$totalsteps))
 ```
 
-The median of the total number of steps taken per day now is `r mediannew`  
+The median of the total number of steps taken per day now is 10766  
 
 The difference between the mean and median values after imputation has become negligibly small.  
 
-```{r echo=TRUE}
+
+```r
 diff <- as.integer(sum(stepsperday_new$totalsteps) - sum(stepsperday$totalsteps))
 ```
 
-By imputating values the total number of steps increased by `r diff`
+By imputating values the total number of steps increased by 86129
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
-```{r echo=TRUE, message=FALSE}
+
+```r
 require(ggplot2)
 require(lubridate)
 ```
 
 To see if there is any difference in activity patterns between weekdays and weekends we first create a variabele that indicates whether the day is a weekday or a day of the weekend. For this I choose to use the lubridate pacakge.  
 
-```{r}
+
+```r
 data <- data%>%
     mutate(day= wday(as.Date(date,"%Y-%m-%d")))
 
@@ -181,11 +227,17 @@ data <- data%>%
     summarize(averagesteps = mean(steps))
 ```
 
-```{r}
+
+```r
 png("./figure/activity_weekend_weekdays.png", width = 800, height = 600)
 ggplot(data,(aes(x=data$interval,y=data$averagesteps)))+
     geom_line(aes(colour=data$daytype))+
     facet_grid(data$daytype~.)+
     labs(x= "Interval", y= "Number of steps",colour="Type of day") 
 dev.off()
+```
+
+```
+## quartz_off_screen 
+##                 2
 ```
